@@ -2,8 +2,11 @@ package com.OMS.OMS_RabbitMQ.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import jakarta.persistence.Id;
+import java.io.Serializable;
 
 
 @Entity
@@ -12,18 +15,23 @@ import jakarta.persistence.Id;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-
-    @Id // Primary key
+public class Order implements Serializable {
+    private static final long serialVersionUID = 1L;
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
     private Long id;
 
-    @jakarta.persistence.Column(nullable = false)
+    @Column(nullable = false)
+    @NotBlank(message = "Order name cannot be blank")
     private String orderName;
 
-    @jakarta.persistence.Column(nullable = false)
+    @Column(nullable = false)
+    @NotNull(message = "Quantity is required")
+    @Min(value = 1, message = "Quantity must be greater than 0")
     private int quantity;
 
-    @jakarta.persistence.Column(nullable = false)
+    @Column(nullable = false)
+    @NotNull(message = "Price is required")
+    @Min(value = 1, message = "Price must be greater than 0")
     private double price;
 }

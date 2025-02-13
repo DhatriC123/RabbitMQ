@@ -3,37 +3,39 @@ package com.OMS.OMS_RabbitMQ.config;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.core.Queue;
-
-import static org.springframework.amqp.rabbit.support.micrometer.RabbitTemplateObservation.TemplateLowCardinalityTags.ROUTING_KEY;
-
 
 @Configuration
 public class RabbitMQConfig {
 
+    @Value("${rabbitmq.queue.name}")
+    private String queueName;
 
-    private static final String EXCHANGE_NAME = "orderExchange";
-    private static final String ROUTING_KEY = "orderRoutingKey";
+    @Value("${rabbitmq.exchange.name}")
+    private String exchangeName;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
     @Bean
     public Queue orderQueue() {
-        return new Queue("orderQueue", false);
+        return new Queue(queueName, false);
     }
-
 
     @Bean
     public DirectExchange orderExchange() {
-        return new DirectExchange(EXCHANGE_NAME);
+        return new DirectExchange(exchangeName);
     }
 
     @Bean
     public Binding binding(Queue orderQueue, DirectExchange orderExchange) {
-        return BindingBuilder.bind(orderQueue).to(orderExchange).with(ROUTING_KEY);
+        return BindingBuilder.bind(orderQueue).to(orderExchange).with(routingKey);
     }
 
     @Bean
@@ -48,5 +50,4 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 }
-
 
